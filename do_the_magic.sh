@@ -25,8 +25,8 @@ REPLACE="  public_key = \\\"$PUB_KEY\\\""
 #Following line does a simple sed replace in keypair.tf. 
 #Did not use direct file replacement to ensure compatibility on linux and BSD based OSs
 echo `cat keypair.tf |sed -e "s|.*public_key.*|$REPLACE|g" > keypair.tf.bk && mv keypair.tf.bk keypair.tf`
-echo "${GRN}Updated keyfile. \n"
-echo "${YLW}Running \"terraform plan\""
+echo "${GRN}Updated keyfile.${NC} \n"
+echo "${YLW}Running \"terraform plan\"${NC}"
 terraform plan
 if [ $? -eq 0 ]; then
     echo "\n\n\"terraform plan\" ran ${GRN}OK${NC}\n"
@@ -42,3 +42,4 @@ if [ $? -eq 0 ]; then
 else
 	echo "\n\n\"terraform apply\" ${RED}Failed${NC}. Check above output for more details.\n"
 fi
+IP=`terraform output | awk '{print $3}'`
