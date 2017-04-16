@@ -6,20 +6,19 @@ YLW='\033[1;33m'
 cd terraform
 if [[ -z $1 ]]; then
 	echo "${YLW}No custom public key filename is passed. \nUsing default publickey (~/.ssh/id_rsa.pub)${NC}"
-	if [ ! -f ~/.ssh/id_rsa.pub ]; then
-		echo "${RED}Default publickey (~/.ssh/id_rsa.pub) is not found.${NC}"
-		exit 2
-	fi
-	PUB_KEY=`cat ~/.ssh/id_rsa.pub`
+	PUB_KEY_FILE="$HOME/.ssh/id_rsa.pub"
 else
 	echo "${YLW}Custom public key file path is $1${NC}"
-	if [ ! -f $1 ]; then
-		echo "${RED}Custom publickey ($1) is not found.${NC}"
-		exit 2
-	fi
-	PUB_KEY=`cat $1`
-#	echo $PUB_KEY
+	PUB_KEY_FILE="$1"
 fi
+
+if [ ! -f $PUB_KEY_FILE ]; then
+	echo "${RED}Publickey ($PUB_KEY_FILE) is not found.${NC}"
+	exit 2
+fi
+
+PUB_KEY=`cat $PUB_KEY_FILE`
+
 echo "${YLW}Updating terraform keypair class with new public key${NC}"
 REPLACE="  public_key = \\\"$PUB_KEY\\\""
 #Following line does a simple sed replace in keypair.tf. 
@@ -42,4 +41,15 @@ if [ $? -eq 0 ]; then
 else
 	echo "\n\n\"terraform apply\" ${RED}Failed${NC}. Check above output for more details.\n"
 fi
+echo "${YLW}Getting IP from terraform${NC}"
 IP=`terraform output | awk '{print $3}'`
+echo "${GRN}IP: $IP ${NC}"
+echo "${YLW}Switching directory to ansible${NC}"
+cd ../ansible
+echo "${YLW}cleaning up the hosts file if there is any old ips present in it${NC}"
+#following or is for linux vs bsd
+sed '/.*wp-docker\]$/,/^\[.*/{//!d;}' hosts > hosts.bk || sed '/.*wp-docker\]$/,/^\[.*/{//!d}' hosts>hosts.bk
+mv hosts.bk hosts
+awk -v IP=$IP 'NR==5{print IP}1' hosts > hosts.new && mv hosts.new hosts
+echo "${GRN}Added new IP to hosts file${NC}"
+
