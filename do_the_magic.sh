@@ -31,7 +31,7 @@ if [ $? -eq 0 ]; then
     echo "\n\n\"terraform plan\" ran ${GRN}OK${NC}\n"
 else
 	echo "\n\n\"terraform plan\" ${RED}failed${NC}. Check above output for more details.\n"
-	exit 2
+	exit
 fi
 
 echo "${YLW}Running \"terraform apply\"${NC}"
@@ -40,6 +40,7 @@ if [ $? -eq 0 ]; then
     echo "\n\n\"terraform apply\" ran ${GRN}OK\n${NC}"
 else
 	echo "\n\n\"terraform apply\" ${RED}Failed${NC}. Check above output for more details.\n"
+	exit
 fi
 echo "${YLW}Getting IP from terraform${NC}"
 IP=`terraform output | awk '{print $3}'`
@@ -50,6 +51,35 @@ echo "${YLW}cleaning up the hosts file if there is any old ips present in it${NC
 #following or is for linux vs bsd
 sed '/.*wp-docker\]$/,/^\[.*/{//!d;}' hosts > hosts.bk || sed '/.*wp-docker\]$/,/^\[.*/{//!d}' hosts>hosts.bk
 mv hosts.bk hosts
-awk -v IP=$IP 'NR==5{print IP}1' hosts > hosts.new && mv hosts.new hosts
+LINE=`cat hosts| grep -n 'wp-docker'|grep -o '^[0-9]*'`
+let "LINE++"
+awk -v IP="$IP" -v LN="$LINE" 'NR==LN{print IP}1' hosts > hosts.new && mv hosts.new hosts
 echo "${GRN}Added new IP to hosts file${NC}"
+
+
+if [[ -z $2 ]]; then
+	echo "${YLW}No custom private key filename is passed. \nUsing default publickey (~/.ssh/id_rsa)${NC}"
+	PRIV_KEY_FILE="$HOME/.ssh/id_rsa.pub"
+else
+	echo "${YLW}Custom private key file path is $1${NC}"
+	PRIV_KEY_FILE="$2"
+fi
+
+if [ ! -f $PRIV_KEY_FILE ]; then
+	echo "${RED}Private key ($PUB_KEY_FILE) is not found.${NC}"
+	exit
+fi
+
+#Following will replaces privatekey file location ansible.cfg
+REPLACE="private_key_file = $PRIV_KEY_FILE"
+echo `cat ansible.cfg |sed -e "s|^private_key_file.*|$REPLACE|g" > ansible.cfg.bk && mv ansible.cfg.bk ansible.cfg`
+
+echo "${YLW}Running ansible ping${NC}"
+ansible wp-docker -i hosts -m ping
+if [ $? -eq 0 ]; then
+    echo "\n\n\"ansible ping\" ran ${GRN}OK\n${NC}"
+else
+	echo "\n\n\"ansible ping\" ${RED}Failed. \n${YLW}It could be becuase the aws ec2 instance is still initiating. Please retry.${NC}\nCheck above output for more details.\n"
+	exit
+fi
 
