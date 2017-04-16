@@ -4,12 +4,12 @@ NC='\033[0m'
 GRN='\033[0;32m'
 YLW='\033[1;33m'
 cd terraform
-if [[ -z $1 ]]; then
+if [[ -z $2 ]]; then
 	echo "${YLW}No custom public key filename is passed. \nUsing default publickey (~/.ssh/id_rsa.pub)${NC}"
 	PUB_KEY_FILE="$HOME/.ssh/id_rsa.pub"
 else
-	echo "${YLW}Custom public key file path is $1${NC}"
-	PUB_KEY_FILE="$1"
+	echo "${YLW}Custom public key file path is $2${NC}"
+	PUB_KEY_FILE="$2"
 fi
 
 if [ ! -f $PUB_KEY_FILE ]; then
@@ -57,11 +57,11 @@ awk -v IP="$IP" -v LN="$LINE" 'NR==LN{print IP}1' hosts > hosts.new && mv hosts.
 echo "${GRN}Added new IP to hosts file${NC}"
 
 
-if [[ -z $2 ]]; then
+if [[ -z $3 ]]; then
 	echo "${YLW}No custom private key filename is passed. \nUsing default publickey (~/.ssh/id_rsa)${NC}"
 	PRIV_KEY_FILE="$HOME/.ssh/id_rsa.pub"
 else
-	echo "${YLW}Custom private key file path is $1${NC}"
+	echo "${YLW}Custom private key file path is $2${NC}"
 	PRIV_KEY_FILE="$2"
 fi
 
@@ -73,8 +73,9 @@ fi
 #Following will replaces privatekey file location ansible.cfg
 REPLACE="private_key_file = $PRIV_KEY_FILE"
 echo `cat ansible.cfg |sed -e "s|^private_key_file.*|$REPLACE|g" > ansible.cfg.bk && mv ansible.cfg.bk ansible.cfg`
-
-echo "${YLW}Running ansible ping${NC}"
+echo "${YLW}Sleeping for 10 seconds before ansible ping\n${NC}\n"
+sleep 10
+echo "${YLW}Running ansible ping\n${NC}"
 ansible wp-docker -i hosts -m ping
 if [ $? -eq 0 ]; then
     echo "\n\n\"ansible ping\" ran ${GRN}OK\n${NC}"
@@ -82,4 +83,5 @@ else
 	echo "\n\n\"ansible ping\" ${RED}Failed. \n${YLW}It could be becuase the aws ec2 instance is still initiating. Please retry.${NC}\nCheck above output for more details.\n"
 	exit
 fi
-
+echo "${YLW}Applying ansible play-book\n${NC}"
+ansible-playbook -i hosts --extra-vars "mysql_password=$1" site.yml
