@@ -1,0 +1,11 @@
+- name: wordpress with docker mysql
+  hosts: wp-docker
+  become: yes
+
+  roles:
+    - setup
+    - docker-configuration
+
+    # docker run --name test123 -e MYSQL_ROOT_PASSWORD=password123 -d mysql/mysql-server:5.6.36
+    # docker exec -it test123 mysql -uroot -ppassword123 -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'password123' WITH GRANT OPTION; FLUSH PRIVILEGES;"
+
