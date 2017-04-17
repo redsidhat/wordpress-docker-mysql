@@ -21,3 +21,7 @@
     - nginx
     - php5-fpm
     - php5-mysql
+    - mysql-client
+    - python-mysqldb
+    - php5-curl
+    - php5-cli
