@@ -10,7 +10,7 @@ This does the following
 
 # Prerequisites
 1. Terraform and ansible installed
-2. Add ACCESS KEY and SECRET KEY in terrafomr/.creds
+2. Add ACCESS KEY and SECRET KEY in terraform/.creds
 3. Default ssh key pair or custom new ones. 
 
 # Usage
