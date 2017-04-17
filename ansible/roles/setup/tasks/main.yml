@@ -10,9 +10,14 @@
     owner: root
     group: root
     mode: 0644
-- name: Installing docker
+- name: Installing docker nginx php-fpm and php-mysql
   apt:
-    name: docker-engine
+    name: "{{item}}"
     update_cache: yes
     cache_valid_time: 36000
-    state: present
+    state: installed
+  with_items:
+    - docker-engine
+    - nginx
+    - php5-fpm
+    - php5-mysql
