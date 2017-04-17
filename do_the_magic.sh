@@ -3,13 +3,21 @@ RED='\033[0;31m'
 NC='\033[0m'
 GRN='\033[0;32m'
 YLW='\033[1;33m'
-cd terraform
+if [[ -z $1 ]]; then
+	echo "${RED}Pass server name as '$1' and mysql password as '$2'. Exiting.${NC}"
+	exit
+fi
 if [[ -z $2 ]]; then
+	echo "${RED}Pass mysql password as '$2'. Exiting.${NC}"
+	exit
+fi
+cd terraform
+if [[ -z $3 ]]; then
 	echo "${YLW}No custom public key filename is passed. \nUsing default publickey (~/.ssh/id_rsa.pub)${NC}"
 	PUB_KEY_FILE="$HOME/.ssh/id_rsa.pub"
 else
-	echo "${YLW}Custom public key file path is $2${NC}"
-	PUB_KEY_FILE="$2"
+	echo "${YLW}Custom public key file path is $3${NC}"
+	PUB_KEY_FILE="$3"
 fi
 
 if [ ! -f $PUB_KEY_FILE ]; then
@@ -57,12 +65,12 @@ awk -v IP="$IP" -v LN="$LINE" 'NR==LN{print IP}1' hosts > hosts.new && mv hosts.
 echo "${GRN}Added new IP to hosts file${NC}"
 
 
-if [[ -z $3 ]]; then
+if [[ -z $4 ]]; then
 	echo "${YLW}No custom private key filename is passed. \nUsing default publickey (~/.ssh/id_rsa)${NC}"
 	PRIV_KEY_FILE="$HOME/.ssh/id_rsa.pub"
 else
-	echo "${YLW}Custom private key file path is $2${NC}"
-	PRIV_KEY_FILE="$2"
+	echo "${YLW}Custom private key file path is $3${NC}"
+	PRIV_KEY_FILE="$3"
 fi
 
 if [ ! -f $PRIV_KEY_FILE ]; then
@@ -83,5 +91,7 @@ else
 	echo "\n\n\"ansible ping\" ${RED}Failed. \n${YLW}It could be becuase the aws ec2 instance is still initiating. Please retry.${NC}\nCheck above output for more details.\n"
 	exit
 fi
+
+
 echo "${YLW}Applying ansible play-book\n${NC}"
-ansible-playbook -i hosts --extra-vars "mysql_password=$1" site.yml
+ansible-playbook -i hosts --extra-vars "mysql_password=$2 server_name=$1" site.yml
