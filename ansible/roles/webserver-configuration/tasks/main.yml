@@ -1,0 +1,18 @@
+- name: Copy nginx conf to server
+  copy:
+    src: "{{ role_path }}/files/wordpress.conf"
+    dest: /etc/nginx/sites-available/wordpress.conf
+    owner: root
+    group: root
+    mode: 0644
+- name: replacing server name in nginx conf
+  shell: "sed -i 's/server_name example.com.*/server_name {{server_name}};/g' /etc/nginx/sites-available/wordpress.conf"
+  notify: 
+    - restart nginx
+- name: Activating site
+  file:
+    src: /etc/nginx/sites-available/wordpress.conf
+    dest: /etc/nginx/sites-enabled/wordpress.conf
+    state: link    
+  notify: 
+    - restart nginx
