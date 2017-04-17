@@ -6,7 +6,7 @@ This does the following
   - configure the server with ansible
   - deploy a simple wordpress post
 
-# each above points will be explained here
+ -------each above points will be explained here-------
 
 # Prerequisites
 1. Terraform and ansible installed
