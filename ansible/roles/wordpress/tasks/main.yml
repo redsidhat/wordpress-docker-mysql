@@ -55,6 +55,12 @@
     login_host: 127.0.0.1
     login_user: root
     login_password: "{{ mysql_password}}"
+- name: Copying auto-post to server
+  copy:
+    src: "{{ role_path }}/files/auto-post.php"
+    dest: /var/www/wordpress/auto-post.php
+    owner: www-data
+    mode: 0644
 - name: Setting permission on docroot
   file:
     path: /var/www/
@@ -64,3 +70,5 @@
     recurse: yes
 - name: Setting 755 perm on direcotries
   command: find /var/www/ -type d -exec chmod 0755 {} \;
+- name: Adding new post with php script
+  shell: php5 /var/www/wordpress/auto-post.php

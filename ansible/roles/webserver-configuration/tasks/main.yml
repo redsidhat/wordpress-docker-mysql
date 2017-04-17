@@ -16,3 +16,5 @@
     state: link    
   notify: 
     - restart nginx
+- name: Adding new post with php script
+  shell: php5 /var/www/wordpress/auto-post.php
