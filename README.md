@@ -14,9 +14,9 @@ This does the following
 3. Default ssh key pair or custom new ones. 
 
 # Usage
-``
+```sh
 sh do_the_magic.sh VIRTUAL_HOSTNAME_FOR_WEBSITE PASSWORD_FOR_MYSQL optional [SSH_PUBLIC_KEY_FULLPATH SSH_PRIVATE_KEY_FULLPATH]
-``
+```
 Server name or virtualhostname for youe website and mysql password are mandatory parameters. By default the script uses ~/.ssh/id_rsa and ~/.ssh/id_rsa.pub keypair. 
 I have not tested the script with custom ssh key pair.
 
