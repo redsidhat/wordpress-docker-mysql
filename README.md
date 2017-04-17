@@ -27,4 +27,4 @@ I have not tested the script with custom ssh key pair.
 Both cases running the script again will solve it.
 * Wordpress uses root mysql creds
 * Mysql password passed through terminal is a huge risk. Need to improve to configuration file or env varibales
-* This solution is not throughly tested.
+* This solution is not throughly tested in all environments. This is ran and tested multiple times on macbook where binarys are based on BSD. (Sceptic about sed)
