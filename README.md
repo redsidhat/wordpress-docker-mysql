@@ -6,20 +6,23 @@ This does the following
   - configure the server with ansible
   - deploy a simple wordpress post
 
-# each above points will be explained here
+ -------each above points will be explained here-------
 
 # Prerequisites
 1. Terraform and ansible installed
-2. Add ACCESS KEY and SECRET KEY in terrafomr/.creds
+2. Add ACCESS KEY and SECRET KEY in terraform/.creds
 3. Default ssh key pair or custom new ones. 
 
 # Usage
-``
+```sh
 sh do_the_magic.sh VIRTUAL_HOSTNAME_FOR_WEBSITE PASSWORD_FOR_MYSQL optional [SSH_PUBLIC_KEY_FULLPATH SSH_PRIVATE_KEY_FULLPATH]
-``
+```
 Server name or virtualhostname for youe website and mysql password are mandatory parameters. By default the script uses ~/.ssh/id_rsa and ~/.ssh/id_rsa.pub keypair. 
 I have not tested the script with custom ssh key pair.
-
+Example:
+```sh
+sh do_the_magic.sh example.com yourmysqlpassw0rd
+```
 ##### note: Known problems/improvements
 * The script seems to fail in two steps when ran for the first time.  
   1. While ansible doing the ping for first time. This is becuase of the server is provisioned but not initialised compeltely
