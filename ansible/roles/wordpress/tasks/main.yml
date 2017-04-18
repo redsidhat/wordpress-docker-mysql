@@ -70,5 +70,4 @@
     recurse: yes
 - name: Setting 755 perm on direcotries
   command: find /var/www/ -type d -exec chmod 0755 {} \;
-- name: Adding new post with php script
-  shell: php5 /var/www/wordpress/auto-post.php
+
