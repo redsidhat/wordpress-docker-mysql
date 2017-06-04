@@ -67,7 +67,7 @@ echo "${GRN}Added new IP to hosts file${NC}"
 
 if [[ -z $4 ]]; then
 	echo "${YLW}No custom private key filename is passed. \nUsing default publickey (~/.ssh/id_rsa)${NC}"
-	PRIV_KEY_FILE="$HOME/.ssh/id_rsa.pub"
+	PRIV_KEY_FILE="$HOME/.ssh/id_rsa"
 else
 	echo "${YLW}Custom private key file path is $3${NC}"
 	PRIV_KEY_FILE="$3"
@@ -81,6 +81,9 @@ fi
 #Following will replaces privatekey file location ansible.cfg
 REPLACE="private_key_file = $PRIV_KEY_FILE"
 echo `cat ansible.cfg |sed -e "s|^private_key_file.*|$REPLACE|g" > ansible.cfg.bk && mv ansible.cfg.bk ansible.cfg`
+#following edits the mysql dump
+echo `cat roles/wordpress/files/wordpress.sql |sed -e "s|example8.com|$1|g" > roles/wordpress/files/wordpress.sql.bk && mv roles/wordpress/files/wordpress.sql.bk roles/wordpress/files/wordpress.sql`
+
 echo "${YLW}Sleeping for 10 seconds before ansible ping\n${NC}\n"
 sleep 10
 echo "${YLW}Running ansible ping\n${NC}"
